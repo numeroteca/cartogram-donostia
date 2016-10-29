@@ -8,32 +8,33 @@ var projection = d3.geoMercator()
 var path = d3.geoPath()
     .projection(projection)
 
+// Font size scale
+var size = d3.scaleLinear()
+    .range([9, 16])
+
 var color = d3.scaleThreshold()
     .domain([-0.16, -0.12, -0.1, -0.08, -0.06, -0.04, -0.02, 0, 0.02])
     .range(['#0c2c84','#225ea8','#1d91c0','#41b6c4','#7fcdbb','#c7e9b4','#edf8b1','#ffffd9', "#fee0d2", "#fcbba1"])
-
-var size = d3.scaleLinear()
-    .range([9, 16])
 
 var svg = d3.select('body').append('svg')
     .attr("width", width)
     .attr("height", height)
 
-var ƒ = d3.f
-
 d3.json('pais_vasco.json', function(err, data) {
 
   projection.fitSize([width, height], topojson.feature(data, data.objects.municipios))
 
+  // NORMAL MAP FOR COMPARISON
   svg.append('path')
     .attr("class", "land")
     .datum(topojson.feature(data, data.objects.municipios))
     .attr('d', path)
 
-  // 1. Feature we need
+  // CARTOGRAM
+  // 1. Features we are painting
   mun = topojson.feature(data, data.objects.municipios).features
 
-  // 2. Create on the feature the centroid and the positions
+  // 2. Create on each feature the centroid and the positions
   mun.forEach(function(d){
     d.pos = projection(d3.geoCentroid(d))
     d.x = d.pos[0]
@@ -77,7 +78,7 @@ d3.json('pais_vasco.json', function(err, data) {
   })*/
 })
 
-//From http://bl.ocks.org/mbostock/4055889
+// From http://bl.ocks.org/mbostock/4055889
 function collide() {
   for (var k = 0, iterations = 4, strength = 0.5; k < iterations; ++k) {
     for (var i = 0, n = mun.length; i < n; ++i) {
