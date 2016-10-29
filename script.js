@@ -9,12 +9,16 @@ var projection = d3.geoConicConformalSpain()
 var path = d3.geoPath()
     .projection(projection)
 
+// Rectangle size
+var rectSize = d3.scaleLinear()
+    .range([10, 80])
+
 // Font size scale
-var size = d3.scaleLinear()
+var fontSize = d3.scaleLinear()
     .range([8, 12])
 
 var color = d3.scaleQuantile()
-    .domain([5, 30])
+    .domain([8, 35])
     .range(['#2166ac', '#4393c3', '#92c5de', '#d1e5f0', '#fddbc7', '#f4a582', '#d6604d', '#b2182b'])
 
 var svg = d3.select('body').append('svg')
@@ -25,16 +29,19 @@ d3.json('provincias.json', function(err, data) {
     // 1. Features we are painting
     prov = topojson.feature(data, data.objects.provincias).features
 
+    // Rect size scale
+    rectSize.domain(d3.extent(prov, function(d) {return d.properties.pop }))
+
     // 2. Create on each feature the centroid and the positions
     prov.forEach(function(d) {
         d.pos = projection(d3.geoCentroid(d))
         d.x = d.pos[0]
         d.y = d.pos[1]
-        d.area = d3.geoArea(d)
-        d.s = d.area * 150000 // Magic number to scale the rects
+        d.area = rectSize(d.properties.pop) // How we scale
     })
 
-    size.domain(d3.extent(prov, function(d) {return d.area }))
+    // Font size scale
+    fontSize.domain(d3.extent(prov, function(d) {return d.area }))
 
     // 3. Collide force
     var simulation = d3.forceSimulation(prov)
@@ -52,7 +59,7 @@ d3.json('provincias.json', function(err, data) {
         .append("rect")
         .each(function(d) {
             d3.select(this)
-              .at({width: d.s, height: d.s, x: -d.s / 2, y: -d.s / 2})
+              .at({width: d.area, height: d.area, x: -d.area / 2, y: -d.area / 2})
               .translate([d.x, d.y])
               .at({fill: color(d.properties.paro), stroke: "white"})
           })
@@ -71,7 +78,7 @@ d3.json('provincias.json', function(err, data) {
                 .at({"text-anchor": "middle"})
                 .translate([d.x, d.y + 2.5])
                 .text(d.properties.code)
-                .style("font-size", size(d.area) + "px")
+                .style("font-size", fontSize(d.area) + "px")
                 .style("font-family", "Helvetica Neue")
         })
 })
@@ -86,7 +93,7 @@ function collide() {
             y = a.y + a.vy - b.y - b.vy,
             lx = Math.abs(x),
             ly = Math.abs(y),
-            r = a.s/2 + b.s/2 + padding;
+            r = a.area/2 + b.area/2 + padding;
         if (lx < r && ly < r) {
           if (lx > ly) {
             lx = (lx - r) * (x < 0 ? -strength : strength);
