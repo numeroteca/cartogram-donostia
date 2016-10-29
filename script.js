@@ -63,9 +63,9 @@ d3.json('pais_vasco.json', function(err, data) {
         .append("rect")
         .each(function(d) {
             d3.select(this)
-              .at({width: d.s, height: d.s, x: -d.s/2, y: -d.s/2})
+              .at({width: d.s, height: d.s, x: -d.s / 2, y: -d.s / 2})
               .translate([d.x, d.y])
-              .at({fill: color(d.properties.dif_2012), stroke: 'white'})
+              .at({fill: color(d.properties.dif_2012), stroke: "white"})
           })
 
     /*svg.appendMany(flCounties, 'text').each(function(d){
