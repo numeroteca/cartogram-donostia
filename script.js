@@ -2,8 +2,7 @@ var width = 960,
     height = 500,
     padding = 0
 
-var projection = d3.geoMercator()
-    .translate([width / 2, height / 2])
+var projection = d3.geoConicConformalSpain()
 
 var path = d3.geoPath()
     .projection(projection)
@@ -20,53 +19,58 @@ var svg = d3.select('body').append('svg')
     .attr("width", width)
     .attr("height", height)
 
-d3.json('pais_vasco.json', function(err, data) {
+d3.json('spain.json', function(err, data) {
 
-    projection.fitSize([width, height], topojson.feature(data, data.objects.municipios))
+    //projection.fitSize([width, height], topojson.feature(data, data.objects.spain))
 
     // NORMAL MAP FOR COMPARISON
     svg.append('path')
         .attr("class", "land")
-        .datum(topojson.feature(data, data.objects.municipios))
+        .datum(topojson.feature(data, data.objects.spain))
         .attr('d', path)
 
     // CARTOGRAM
     // 1. Features we are painting
-    mun = topojson.feature(data, data.objects.municipios).features
+    spain = topojson.feature(data, data.objects.spain).features
 
     // 2. Create on each feature the centroid and the positions
-    mun.forEach(function(d) {
+    spain.forEach(function(d) {
         d.pos = projection(d3.geoCentroid(d))
         d.x = d.pos[0]
         d.y = d.pos[1]
         d.area = d3.geoArea(d)
-        d.s = d.area * 12000000 // Magic number to scale the rects
+        d.s = d.area * 40000 // Magic number to scale the rects
     })
 
     //size.domain(d3.extent(data, function(d) {return d.area }))
 
     // 3. Collide force
-    var simulation = d3.forceSimulation(mun)
+    var simulation = d3.forceSimulation(spain)
         .force("x", d3.forceX(function(d) { return d.pos[0] }).strength(.1))
         .force("y", d3.forceY(function(d) { return d.pos[1] }).strength(.1))
         .force('collide', collide)
 
     // 4. Number of simulations
-    for (var i = 0; i < 1; ++i) simulation.tick()
+    for (var i = 0; i < 100; ++i) simulation.tick()
 
     svg = d3.select('body').append('svg').at({width, height})
 
     // 5. Paint the cartogram
     svg.selectAll("rect")
-        .data(mun)
+        .data(spain)
         .enter()
         .append("rect")
         .each(function(d) {
             d3.select(this)
               .at({width: d.s, height: d.s, x: -d.s / 2, y: -d.s / 2})
               .translate([d.x, d.y])
-              .at({fill: color(d.properties.dif_2012), stroke: "white"})
+              .at({fill: "#ccc", stroke: "white"})
           })
+
+    svg.append("path")
+      .style("fill","none")
+      .style("stroke","black")
+      .attr("d", projection.getCompositionBorders())
 
     /*svg.appendMany(flCounties, 'text').each(function(d){
     d3.select(this)
@@ -81,9 +85,9 @@ d3.json('pais_vasco.json', function(err, data) {
 // From http://bl.ocks.org/mbostock/4055889
 function collide() {
   for (var k = 0, iterations = 4, strength = 0.5; k < iterations; ++k) {
-    for (var i = 0, n = mun.length; i < n; ++i) {
-      for (var a = mun[i], j = i + 1; j < n; ++j) {
-        var b = mun[j],
+    for (var i = 0, n = spain.length; i < n; ++i) {
+      for (var a = spain[i], j = i + 1; j < n; ++j) {
+        var b = spain[j],
             x = a.x + a.vx - b.x - b.vx,
             y = a.y + a.vy - b.y - b.vy,
             lx = Math.abs(x),
