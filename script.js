@@ -1,6 +1,6 @@
 var width = 960,
     height = 650,
-    padding = 0
+    padding = 5
 
 var projection = d3.geoConicConformalSpain()
     .translate([width / 2, height / 2])
@@ -11,27 +11,17 @@ var path = d3.geoPath()
 
 // Font size scale
 var size = d3.scaleLinear()
-    .range([9, 16])
+    .range([8, 12])
 
-var color = d3.scaleThreshold()
-    .domain([-0.16, -0.12, -0.1, -0.08, -0.06, -0.04, -0.02, 0, 0.02])
-    .range(['#0c2c84','#225ea8','#1d91c0','#41b6c4','#7fcdbb','#c7e9b4','#edf8b1','#ffffd9', "#fee0d2", "#fcbba1"])
+var color = d3.scaleQuantile()
+    .domain([5, 30])
+    .range(['#2166ac', '#4393c3', '#92c5de', '#d1e5f0', '#fddbc7', '#f4a582', '#d6604d', '#b2182b'])
 
 var svg = d3.select('body').append('svg')
     .attr("width", width)
     .attr("height", height)
 
 d3.json('provincias.json', function(err, data) {
-
-    //projection.fitSize([width, height], topojson.feature(data, data.objects.spain))
-
-    // NORMAL MAP FOR COMPARISON
-    /*svg.append('path')
-        .attr("class", "land")
-        .datum(topojson.feature(data, data.objects.provincias))
-        .attr('d', path)*/
-
-    // CARTOGRAM
     // 1. Features we are painting
     prov = topojson.feature(data, data.objects.provincias).features
 
@@ -41,10 +31,10 @@ d3.json('provincias.json', function(err, data) {
         d.x = d.pos[0]
         d.y = d.pos[1]
         d.area = d3.geoArea(d)
-        d.s = d.area * 110000 // Magic number to scale the rects
+        d.s = d.area * 150000 // Magic number to scale the rects
     })
 
-    //size.domain(d3.extent(data, function(d) {return d.area }))
+    size.domain(d3.extent(prov, function(d) {return d.area }))
 
     // 3. Collide force
     var simulation = d3.forceSimulation(prov)
@@ -64,7 +54,7 @@ d3.json('provincias.json', function(err, data) {
             d3.select(this)
               .at({width: d.s, height: d.s, x: -d.s / 2, y: -d.s / 2})
               .translate([d.x, d.y])
-              .at({fill: "#ccc", stroke: "white"})
+              .at({fill: color(d.properties.paro), stroke: "white"})
           })
 
     svg.append("path")
@@ -72,14 +62,18 @@ d3.json('provincias.json', function(err, data) {
       .style("stroke","black")
       .attr("d", projection.getCompositionBorders())
 
-    /*svg.appendMany(flCounties, 'text').each(function(d){
-    d3.select(this)
-        .at({"text-anchor": "middle"})
-        .translate([d.x, d.y + 5])
-        .text(d.id)
-        .style("font-size", size(d.area) + "px")
-        .style("font-family", "Helvetica Neue")
-    })*/
+      svg.selectAll("text")
+          .data(prov)
+          .enter()
+          .append("text")
+          .each(function(d) {
+            d3.select(this)
+                .at({"text-anchor": "middle"})
+                .translate([d.x, d.y + 2.5])
+                .text(d.properties.code)
+                .style("font-size", size(d.area) + "px")
+                .style("font-family", "Helvetica Neue")
+        })
 })
 
 // From http://bl.ocks.org/mbostock/4055889
