@@ -1,6 +1,6 @@
 var width = 960,
     height = 650,
-    padding = 5
+    padding = 4
 
 var projection = d3.geoConicConformalSpain()
     .translate([width / 2, height / 2])
@@ -10,12 +10,12 @@ var path = d3.geoPath()
     .projection(projection)
 
 // Rectangle size
-var rectSize = d3.scaleLinear()
+var rectSize = d3.scaleLog()
     .range([10, 80])
 
 // Font size scale
 var fontSize = d3.scaleLinear()
-    .range([8, 12])
+    .range([8, 16])
 
 var color = d3.scaleQuantile()
     .domain([8, 35])
@@ -65,17 +65,17 @@ d3.json('provincias.json', function(err, data) {
           })
 
     svg.append("path")
-      .style("fill","none")
-      .style("stroke","black")
-      .attr("d", projection.getCompositionBorders())
+        .style("fill","none")
+        .style("stroke","black")
+        .attr("d", projection.getCompositionBorders())
 
-      svg.selectAll("text")
-          .data(prov)
-          .enter()
-          .append("text")
-          .each(function(d) {
+    svg.selectAll("text")
+        .data(prov)
+        .enter()
+        .append("text")
+        .each(function(d) {
             d3.select(this)
-                .at({"text-anchor": "middle"})
+                .at({"text-anchor": "middle", "class": d.properties.code})
                 .translate([d.x, d.y + 2.5])
                 .text(d.properties.code)
                 .style("font-size", fontSize(d.area) + "px")
