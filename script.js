@@ -29,7 +29,6 @@ d3.json('pais_vasco.json', function(err, data) {
     .attr("class", "land")
     .datum(topojson.feature(data, data.objects.municipios))
     .attr('d', path)
-    //.at({opacity: opacity})
 
   // 1. Feature we need
   mun = topojson.feature(data, data.objects.municipios).features
@@ -46,24 +45,27 @@ d3.json('pais_vasco.json', function(err, data) {
   //size.domain(d3.extent(data, function(d) {return d.area }))
 
   // 3. Collide force
-  var simulation = d3.forceSimulation(data)
-    .force('x', d3.forceX(ƒ('pos', 0)).strength(.1))
-    .force('y', d3.forceY(ƒ('pos', 1)).strength(.1))
+  var simulation = d3.forceSimulation(mun)
+    .force("x", d3.forceX(function(d) { return d.pos[0] }).strength(.1))
+    .force("y", d3.forceY(function(d) { return d.pos[1] }).strength(.1))
     .force('collide', collide)
 
   // 4. Number of simulations
-  for (var i = 0; i < 100; ++i) simulation.tick()
+  for (var i = 0; i < 1; ++i) simulation.tick()
 
   svg = d3.select('body').append('svg').at({width, height})
 
   // 5. Paint the cartogram
-  svg.appendMany(mun, 'rect').each(function(d){
-      //console.log(d)
-    d3.select(this)
-      .at({width: d.s, height: d.s, x: -d.s/2, y: -d.s/2})
-      .translate([d.x, d.y])
-      .at({fill: color(d.properties.dif_2012), stroke: 'white'})
-  })
+  svg.selectAll("rect")
+    .data(mun)
+    .enter()
+    .append("rect")
+    .each(function(d) {
+        d3.select(this)
+          .at({width: d.s, height: d.s, x: -d.s/2, y: -d.s/2})
+          .translate([d.x, d.y])
+          .at({fill: color(d.properties.dif_2012), stroke: 'white'})
+      })
 
   /*svg.appendMany(flCounties, 'text').each(function(d){
     d3.select(this)
