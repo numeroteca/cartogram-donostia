@@ -22,60 +22,60 @@ var svg = d3.select('body').append('svg')
 
 d3.json('pais_vasco.json', function(err, data) {
 
-  projection.fitSize([width, height], topojson.feature(data, data.objects.municipios))
+    projection.fitSize([width, height], topojson.feature(data, data.objects.municipios))
 
-  // NORMAL MAP FOR COMPARISON
-  svg.append('path')
-    .attr("class", "land")
-    .datum(topojson.feature(data, data.objects.municipios))
-    .attr('d', path)
+    // NORMAL MAP FOR COMPARISON
+    svg.append('path')
+        .attr("class", "land")
+        .datum(topojson.feature(data, data.objects.municipios))
+        .attr('d', path)
 
-  // CARTOGRAM
-  // 1. Features we are painting
-  mun = topojson.feature(data, data.objects.municipios).features
+    // CARTOGRAM
+    // 1. Features we are painting
+    mun = topojson.feature(data, data.objects.municipios).features
 
-  // 2. Create on each feature the centroid and the positions
-  mun.forEach(function(d){
-    d.pos = projection(d3.geoCentroid(d))
-    d.x = d.pos[0]
-    d.y = d.pos[1]
-    d.area = d3.geoArea(d)
-    d.s = d.area * 12000000 // Magic number to scale the rects
-  })
+    // 2. Create on each feature the centroid and the positions
+    mun.forEach(function(d) {
+        d.pos = projection(d3.geoCentroid(d))
+        d.x = d.pos[0]
+        d.y = d.pos[1]
+        d.area = d3.geoArea(d)
+        d.s = d.area * 12000000 // Magic number to scale the rects
+    })
 
-  //size.domain(d3.extent(data, function(d) {return d.area }))
+    //size.domain(d3.extent(data, function(d) {return d.area }))
 
-  // 3. Collide force
-  var simulation = d3.forceSimulation(mun)
-    .force("x", d3.forceX(function(d) { return d.pos[0] }).strength(.1))
-    .force("y", d3.forceY(function(d) { return d.pos[1] }).strength(.1))
-    .force('collide', collide)
+    // 3. Collide force
+    var simulation = d3.forceSimulation(mun)
+        .force("x", d3.forceX(function(d) { return d.pos[0] }).strength(.1))
+        .force("y", d3.forceY(function(d) { return d.pos[1] }).strength(.1))
+        .force('collide', collide)
 
-  // 4. Number of simulations
-  for (var i = 0; i < 1; ++i) simulation.tick()
+    // 4. Number of simulations
+    for (var i = 0; i < 1; ++i) simulation.tick()
 
-  svg = d3.select('body').append('svg').at({width, height})
+    svg = d3.select('body').append('svg').at({width, height})
 
-  // 5. Paint the cartogram
-  svg.selectAll("rect")
-    .data(mun)
-    .enter()
-    .append("rect")
-    .each(function(d) {
-        d3.select(this)
-          .at({width: d.s, height: d.s, x: -d.s/2, y: -d.s/2})
-          .translate([d.x, d.y])
-          .at({fill: color(d.properties.dif_2012), stroke: 'white'})
-      })
+    // 5. Paint the cartogram
+    svg.selectAll("rect")
+        .data(mun)
+        .enter()
+        .append("rect")
+        .each(function(d) {
+            d3.select(this)
+              .at({width: d.s, height: d.s, x: -d.s/2, y: -d.s/2})
+              .translate([d.x, d.y])
+              .at({fill: color(d.properties.dif_2012), stroke: 'white'})
+          })
 
-  /*svg.appendMany(flCounties, 'text').each(function(d){
+    /*svg.appendMany(flCounties, 'text').each(function(d){
     d3.select(this)
-      .at({"text-anchor": "middle"})
-      .translate([d.x, d.y + 5])
-      .text(d.id)
-      .style("font-size", size(d.area) + "px")
-      .style("font-family", "Helvetica Neue")
-  })*/
+        .at({"text-anchor": "middle"})
+        .translate([d.x, d.y + 5])
+        .text(d.id)
+        .style("font-size", size(d.area) + "px")
+        .style("font-family", "Helvetica Neue")
+    })*/
 })
 
 // From http://bl.ocks.org/mbostock/4055889
