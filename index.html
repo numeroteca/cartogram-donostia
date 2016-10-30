@@ -44,8 +44,8 @@ var path = d3.geoPath()
     .projection(projection)
 
 // Rectangle size
-var rectSize = d3.scaleLog()
-    .range([14, 80])
+var rectSize = d3.scaleSqrt()
+    .range([14, 150])
 
 // Font size scale
 var fontSize = d3.scaleLinear()
