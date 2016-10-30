@@ -103,6 +103,7 @@ d3.json("provincias.json", function(err, data) {
               .attr("y", -d.area / 2)
               .attr("fill", color(d.properties.paro))
               .attr("stroke", "white")
+              .attr("rx", 2)
           })
 
     rect.append("text")
