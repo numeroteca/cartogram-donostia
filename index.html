@@ -33,7 +33,7 @@ body {
 
 <script>
 var width = 960,
-    height = 660,
+    height = 690,
     padding = 4
 
 var projection = d3.geoConicConformalSpain()
@@ -44,7 +44,7 @@ var path = d3.geoPath()
     .projection(projection)
 
 // Rectangle size
-var rectSize = d3.scaleSqrt()
+var rectSize = d3.scaleLinear()
     .range([14, 150])
 
 // Font size scale
@@ -64,14 +64,14 @@ d3.json("provincias.json", function(err, data) {
     prov = topojson.feature(data, data.objects.provincias).features
 
     // Rect size scale
-    rectSize.domain(d3.extent(prov, function(d) {return d.properties.pop }))
+    rectSize.domain(d3.extent(prov, function(d) {return d.properties.seats }))
 
     // 2. Create on each feature the centroid and the positions
     prov.forEach(function(d) {
         d.pos = projection(d3.geoCentroid(d))
         d.x = d.pos[0]
         d.y = d.pos[1]
-        d.area = rectSize(d.properties.pop) // How we scale
+        d.area = rectSize(d.properties.seats) // How we scale
     })
 
     // Font size scale
