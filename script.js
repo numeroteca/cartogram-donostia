@@ -1,5 +1,5 @@
 var width = 960,
-    height = 650,
+    height = 660,
     padding = 4
 
 var projection = d3.geoConicConformalSpain()
@@ -11,7 +11,7 @@ var path = d3.geoPath()
 
 // Rectangle size
 var rectSize = d3.scaleLog()
-    .range([10, 80])
+    .range([14, 80])
 
 // Font size scale
 var fontSize = d3.scaleLinear()
@@ -53,34 +53,34 @@ d3.json('provincias.json', function(err, data) {
     for (var i = 0; i < 100; ++i) simulation.tick()
 
     // 5. Paint the cartogram
-    svg.selectAll("rect")
+    var rect = svg.selectAll("g")
         .data(prov)
         .enter()
-        .append("rect")
+        .append("g")
+        .attr("class", function(d) { return "prov " + d.properties.code })
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
+
+    rect.append("rect")
         .each(function(d) {
             d3.select(this)
               .at({width: d.area, height: d.area, x: -d.area / 2, y: -d.area / 2})
-              .translate([d.x, d.y])
               .at({fill: color(d.properties.paro), stroke: "white"})
           })
 
-    svg.append("path")
-        .style("fill","none")
-        .style("stroke","black")
-        .attr("d", projection.getCompositionBorders())
-
-    svg.selectAll("text")
-        .data(prov)
-        .enter()
-        .append("text")
+    rect.append("text")
         .each(function(d) {
             d3.select(this)
-                .at({"text-anchor": "middle", "class": d.properties.code})
-                .translate([d.x, d.y + 2.5])
+                .at({"text-anchor": "middle", "dy": 3})
                 .text(d.properties.code)
                 .style("font-size", fontSize(d.area) + "px")
                 .style("font-family", "Helvetica Neue")
         })
+
+    // Canary islands path
+    svg.append("path")
+        .style("fill","none")
+        .style("stroke","black")
+        .attr("d", projection.getCompositionBorders())
 })
 
 // From http://bl.ocks.org/mbostock/4055889
