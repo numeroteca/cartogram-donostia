@@ -5,26 +5,6 @@ body {
     margin: 0px;
     font-family: "Helvetica Neue", sans-serif;
 }
-.LU text,
-.VA text,
-.P text,
-.S text,
-.BI text,
-.VI text,
-.LO text,
-.NA text,
-.B text,
-.GI text,
-.TE text,
-.SS text,
-.BU text,
-.SG text,
-.SO text,
-.HU text,
-.L text,
-.PM text {
-    fill: white;
-}
 </style>
 <body>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -51,9 +31,13 @@ var rectSize = d3.scaleLinear()
 var fontSize = d3.scaleLinear()
     .range([8, 16])
 
-var color = d3.scaleQuantile()
-    .domain([8, 35])
-    .range(["#2166ac", "#4393c3", "#92c5de", "#d1e5f0", "#fddbc7", "#f4a582", "#d6604d", "#b2182b"])
+// Party
+var color = d3.scaleOrdinal()
+    .domain(["PP", "PSOE", "UP", "ERC"])
+    .range(["hsl(203, 52%, 60%)", "hsl(353, 76%, 60%)", "hsl(323, 57%, 60%)", "hsl(37, 100%, 60%)"])
+
+var intensity = d3.scaleLinear()
+    .range([10, 90])
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -65,6 +49,7 @@ d3.json("provincias.json", function(err, data) {
 
     // Rect size scale
     rectSize.domain(d3.extent(prov, function(d) {return d.properties.seats }))
+    intensity.domain(d3.extent(prov, function(d) {return d.properties.margin }))
 
     // 2. Create on each feature the centroid and the positions
     prov.forEach(function(d) {
@@ -101,7 +86,7 @@ d3.json("provincias.json", function(err, data) {
               .attr("height", d.area)
               .attr("x", -d.area / 2)
               .attr("y", -d.area / 2)
-              .attr("fill", color(d.properties.paro))
+              .attr("fill", color(d.properties.winner))
               .attr("stroke", "white")
               .attr("rx", 2)
           })
@@ -112,6 +97,7 @@ d3.json("provincias.json", function(err, data) {
                 .attr("text-anchor", "middle")
                 .attr("dy", 3)
                 .text(d.properties.code)
+                .style("fill", "white")
                 .style("font-size", fontSize(d.area) + "px")
         })
 
