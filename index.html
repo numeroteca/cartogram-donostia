@@ -41,7 +41,6 @@ var svg = d3.select("body").append("svg")
     .attr("height", height)
 
 d3.json("provincias.json", function(err, data) {
-    console.log(data)
     // 1. Features we are painting
     prov = topojson.feature(data, data.objects.provincias).features
 
