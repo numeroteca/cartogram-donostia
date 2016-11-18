@@ -24,23 +24,24 @@ var path = d3.geoPath()
     .projection(projection)
 
 // Rectangle size
-var rectSize = d3.scaleLinear()
-    .range([14, 150])
+var rectSize = d3.scaleSqrt()
+    .range([20, 120])
 
 // Font size scale
 var fontSize = d3.scaleLinear()
-    .range([8, 16])
+    .range([8, 24])
 
 // Party
-var color = d3.scaleOrdinal()
-    .domain(["PP", "PSOE", "UP", "ERC"])
-    .range(["hsl(203, 52%, 60%)", "hsl(353, 76%, 60%)", "hsl(323, 57%, 60%)", "hsl(37, 100%, 60%)"])
+var color = d3.scaleQuantile()
+    .domain([5, 30])
+    .range(['#ffffe0','#ffd59b','#ffa474','#f47461','#db4551','#b81b34','#8b0000'])
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height)
 
 d3.json("provincias.json", function(err, data) {
+    console.log(data)
     // 1. Features we are painting
     prov = topojson.feature(data, data.objects.provincias).features
 
@@ -52,7 +53,7 @@ d3.json("provincias.json", function(err, data) {
         d.pos = projection(d3.geoCentroid(d))
         d.x = d.pos[0]
         d.y = d.pos[1]
-        d.area = rectSize(d.properties.seats) // How we scale
+        d.area = rectSize(d.properties.pop) / 350 // How we scale
     })
 
     // Font size scale
@@ -65,14 +66,14 @@ d3.json("provincias.json", function(err, data) {
         .force("collide", collide)
 
     // 4. Number of simulations
-    for (var i = 0; i < 100; ++i) simulation.tick()
+    for (var i = 0; i < 120; ++i) simulation.tick()
 
     // 5. Paint the cartogram
     var rect = svg.selectAll("g")
         .data(prov)
         .enter()
         .append("g")
-        .attr("class", function(d) { return "prov " + d.properties.code })
+        .attr("class", function(d) { return "prov " + d.properties.code.toLowerCase() })
         .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
 
     rect.append("rect")
@@ -82,7 +83,7 @@ d3.json("provincias.json", function(err, data) {
               .attr("height", d.area)
               .attr("x", -d.area / 2)
               .attr("y", -d.area / 2)
-              .attr("fill", color(d.properties.winner))
+              .attr("fill", color(d.properties.paro))
               .attr("stroke", "white")
               .attr("rx", 2)
           })
