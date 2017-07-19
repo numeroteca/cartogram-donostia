@@ -16,12 +16,13 @@ var width = 960,
     height = 690,
     padding = 4
 
-var projection = d3.geoConicConformalSpain()
-    .translate([width / 2, height / 2])
-    .scale(3500)
+//var projection = d3.geoConicConformalSpain()
+//    .translate([width / 2, height / 2])
+//    .scale(3500)
 
-var path = d3.geoPath()
-    .projection(projection)
+//  .scale(width / 2 / Math.PI)
+//  .scale(300)
+//  .translate([width / 2, height / 2])
 
 // Rectangle size
 var rectSize = d3.scaleSqrt()
@@ -40,19 +41,27 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height)
 
-d3.json("provincias.json", function(err, data) {
+d3.json("barrios.json", function(err, data) {
+
+// move projection inside json to be able to get data
+var projection = d3.geoMercator()
+    .fitSize([width, height], topojson.feature(data, data.objects.barrios));
+
+var path = d3.geoPath()
+    .projection(projection);
+
     // 1. Features we are painting
-    prov = topojson.feature(data, data.objects.provincias).features
+    prov = topojson.feature(data, data.objects.barrios).features
 
     // Rect size scale
-    rectSize.domain(d3.extent(prov, function(d) {return d.properties.seats }))
+    rectSize.domain(d3.extent(prov, function(d) {return d.properties.totviviend }))
 
     // 2. Create on each feature the centroid and the positions
     prov.forEach(function(d) {
         d.pos = projection(d3.geoCentroid(d))
         d.x = d.pos[0]
         d.y = d.pos[1]
-        d.area = rectSize(d.properties.pop) / 350 // How we scale
+        d.area = rectSize(d.properties.totviviend) / 350 // How we scale
     })
 
     // Font size scale
@@ -72,7 +81,7 @@ d3.json("provincias.json", function(err, data) {
         .data(prov)
         .enter()
         .append("g")
-        .attr("class", function(d) { return "prov " + d.properties.code.toLowerCase() })
+        .attr("class", function(d) { return "prov " + d.properties.BAR_DS_O.toLowerCase() })
         .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
 
     rect.append("rect")
@@ -82,7 +91,8 @@ d3.json("provincias.json", function(err, data) {
               .attr("height", d.area)
               .attr("x", -d.area / 2)
               .attr("y", -d.area / 2)
-              .attr("fill", color(d.properties.paro))
+             // .attr("fill", color(d.properties.paro))
+              .attr("fill", color(d.properties.perc))
               .attr("stroke", "white")
               .attr("rx", 2)
           })
@@ -92,16 +102,10 @@ d3.json("provincias.json", function(err, data) {
             d3.select(this)
                 .attr("text-anchor", "middle")
                 .attr("dy", 3)
-                .text(d.properties.code)
+                .text(d.properties.BAR_DS_O)
                 .style("fill", "white")
                 .style("font-size", fontSize(d.area) + "px")
         })
-
-    // Canary islands path
-    svg.append("path")
-        .style("fill","none")
-        .style("stroke","black")
-        .attr("d", projection.getCompositionBorders())
 })
 
 // From http://bl.ocks.org/mbostock/4055889
