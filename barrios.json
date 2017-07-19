@@ -145,32 +145,6 @@
                "type":"Polygon",
                "properties":{
                   "BAR_CL":42006900000300,
-                  "BAR_BARR":"006",
-                  "BAR_DS_O":"Ategorrieta-Ulia",
-                  "BAR_MUNI":"069",
-                  "BAR_MUNI_D":"Donostia / San Sebastián",
-                  "BAR_PROV":"20",
-                  "BAR_PROV_D":"Gipuzkoa",
-                  "Shape_Leng":13639.425624,
-                  "Shape_Area":2804125.53741,
-                  "NUMPOINTS":65,
-                  "totviviend":1709,
-                  "perc":0.038
-               },
-               "arcs":[
-                  [
-                     22,
-                     23,
-                     24,
-                     25,
-                     -1
-                  ]
-               ]
-            },
-            {
-               "type":"Polygon",
-               "properties":{
-                  "BAR_CL":42006900000300,
                   "BAR_BARR":"018",
                   "BAR_DS_O":"Landarbaso",
                   "BAR_MUNI":"069",
@@ -451,6 +425,32 @@
                      -10,
                      -32,
                      -23
+                  ]
+               ]
+            },
+            {
+               "type":"Polygon",
+               "properties":{
+                  "BAR_CL":42006900000300,
+                  "BAR_BARR":"006",
+                  "BAR_DS_O":"Ategorrieta-Ulia",
+                  "BAR_MUNI":"069",
+                  "BAR_MUNI_D":"Donostia / San Sebastián",
+                  "BAR_PROV":"20",
+                  "BAR_PROV_D":"Gipuzkoa",
+                  "Shape_Leng":13639.425624,
+                  "Shape_Area":2804125.53741,
+                  "NUMPOINTS":65,
+                  "totviviend":1709,
+                  "perc":0.038
+               },
+               "arcs":[
+                  [
+                     22,
+                     23,
+                     24,
+                     25,
+                     -1
                   ]
                ]
             },
