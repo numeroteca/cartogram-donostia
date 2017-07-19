@@ -34,7 +34,7 @@ var fontSize = d3.scaleLinear()
 
 // Party
 var color = d3.scaleQuantile()
-    .domain([5, 30])
+    .domain([0, 0.0766])
     .range(['#ffffe0','#ffd59b','#ffa474','#f47461','#db4551','#b81b34','#8b0000'])
 
 var svg = d3.select("body").append("svg")
@@ -61,7 +61,7 @@ var path = d3.geoPath()
         d.pos = projection(d3.geoCentroid(d))
         d.x = d.pos[0]
         d.y = d.pos[1]
-        d.area = rectSize(d.properties.totviviend) / 350 // How we scale
+        d.area = rectSize(d.properties.totviviend) / 1 // How we scale
     })
 
     // Font size scale
@@ -81,7 +81,7 @@ var path = d3.geoPath()
         .data(prov)
         .enter()
         .append("g")
-        .attr("class", function(d) { return "prov " + d.properties.BAR_DS_O.toLowerCase() })
+        .attr("class", function(d) { return "prov " + d.properties.BAR_DS_O })
         .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")" })
 
     rect.append("rect")
@@ -91,9 +91,8 @@ var path = d3.geoPath()
               .attr("height", d.area)
               .attr("x", -d.area / 2)
               .attr("y", -d.area / 2)
-             // .attr("fill", color(d.properties.paro))
               .attr("fill", color(d.properties.perc))
-              .attr("stroke", "white")
+              .attr("stroke", "#ccc")
               .attr("rx", 2)
           })
 
@@ -103,8 +102,9 @@ var path = d3.geoPath()
                 .attr("text-anchor", "middle")
                 .attr("dy", 3)
                 .text(d.properties.BAR_DS_O)
-                .style("fill", "white")
-                .style("font-size", fontSize(d.area) + "px")
+                .style("fill", "black")
+                //.style("font-size", fontSize(d.area) + "px")
+                .style("font-size", "12px")
         })
 })
 
